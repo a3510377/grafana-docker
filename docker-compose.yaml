@@ -26,6 +26,7 @@ services:
     image: grafana/grafana
     restart: unless-stopped
     container_name: grafana
+    user: uid:gid
     volumes:
       - ./data/grafana:/var/lib/grafana
       - ./config/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
