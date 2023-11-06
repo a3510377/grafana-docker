@@ -1,15 +1,15 @@
 services:
-  # node_exporter:
-  #   image: quay.io/prometheus/node-exporter:latest
-  #   restart: unless-stopped
-  #   container_name: node_exporter
-  #   command:
-  #     - --path.rootfs=/host
-  #   network_mode: host
-  #   pid: host
-  #   expose: [9090]
-  #   volumes:
-  #     - /:/host:ro,rslave
+  node_exporter:
+    image: quay.io/prometheus/node-exporter:latest
+    restart: unless-stopped
+    container_name: node_exporter
+    command:
+      - --path.rootfs=/host
+    network_mode: host
+    pid: host
+    expose: [9090]
+    volumes:
+      - /:/host:ro,rslave
 
   prometheus:
     image: prom/prometheus
@@ -19,8 +19,8 @@ services:
       - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
       - ./data/prometheus:/prometheus
     expose: [9090:9090]
-    # depends_on:
-    #   - node_exporter
+    depends_on:
+      - node_exporter
 
   grafana:
     image: grafana/grafana
