@@ -6,7 +6,6 @@ services:
     image: quay.io/prometheus/node-exporter:latest
     restart: unless-stopped
     container_name: node_exporter
-    user: ${UID}
     command:
       - --path.rootfs=/host
     network_mode: host
@@ -19,7 +18,6 @@ services:
     image: prom/prometheus
     restart: unless-stopped
     container_name: prometheus
-    user: ${UID}
     volumes:
       - ${MAIN_PATH:-.}/config/prometheus:/etc/prometheus
       - ${MAIN_PATH:-.}/data/prometheus:/prometheus
@@ -31,7 +29,6 @@ services:
     image: grafana/grafana
     restart: unless-stopped
     container_name: grafana
-    user: ${UID}
     volumes:
       - ${MAIN_PATH:-.}/data/grafana:/var/lib/grafana
       - ${MAIN_PATH:-.}/config/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
@@ -47,7 +44,6 @@ services:
   grafana_renderer:
     image: grafana/grafana-image-renderer
     restart: unless-stopped
-    user: ${UID}
     environment:
       BROWSER_TZ: Asia/Taipei
     ports: [8081:8081]
