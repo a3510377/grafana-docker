@@ -1,37 +1,37 @@
-# UID
-# MAIN_PATH
-
 services:
-  node_exporter:
-    image: quay.io/prometheus/node-exporter:latest
-    restart: unless-stopped
-    container_name: node_exporter
-    command:
-      - --path.rootfs=/host
-    network_mode: host
-    pid: host
-    expose: [9090]
-    volumes:
-      - /:/host:ro,rslave
+  # node_exporter:
+  #   image: quay.io/prometheus/node-exporter:latest
+  #   restart: unless-stopped
+  #   container_name: node_exporter
+  #   command:
+  #     - --path.rootfs=/host
+  #   network_mode: host
+  #   pid: host
+  #   expose: [9090]
+  #   networks: [background]
+  #   volumes:
+  #     - /:/host:ro,rslave
 
   prometheus:
     image: prom/prometheus
     restart: unless-stopped
-    container_name: prometheus
+    expose: [9090]
     volumes:
-      - ${MAIN_PATH:-.}/config/prometheus:/etc/prometheus
-      - ${MAIN_PATH:-.}/data/prometheus:/prometheus
-    expose: [9090:9090]
-    depends_on:
-      - node_exporter
+      - prometheus-volume:/prometheus
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+    networks: [background]
+    # depends_on:
+    #   - node_exporter
 
   grafana:
     image: grafana/grafana
     restart: unless-stopped
-    container_name: grafana
     volumes:
-      - ${MAIN_PATH:-.}/data/grafana:/var/lib/grafana
-      - ${MAIN_PATH:-.}/config/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
+      - ./datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
     ports: [3000:3000]
     environment:
       GF_USERS_DEFAULT_LANGUAGE: detect
@@ -39,11 +39,17 @@ services:
       GF_RENDERING_CALLBACK_URL: http://grafana:3000/
     depends_on:
       - prometheus
-      - grafana_renderer
+      # - grafana_renderer
 
-  grafana_renderer:
-    image: grafana/grafana-image-renderer
-    restart: unless-stopped
-    environment:
-      BROWSER_TZ: Asia/Taipei
-    ports: [8081:8081]
+  # grafana_renderer:
+  #   image: grafana/grafana-image-renderer
+  #   restart: unless-stopped
+  #   environment:
+  #     BROWSER_TZ: Asia/Taipei
+  #   ports: [8081:8081]
+
+volumes:
+  prometheus-volume: {}
+
+networks:
+  background:
