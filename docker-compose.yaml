@@ -16,7 +16,7 @@ services:
     restart: unless-stopped
     container_name: prometheus
     volumes:
-      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./config/prometheus:/etc/prometheus
       - ./data/prometheus:/prometheus
     expose: [9090:9090]
     depends_on:
@@ -45,3 +45,7 @@ services:
     environment:
       BROWSER_TZ: Asia/Taipei
     ports: [8081:8081]
+
+networks:
+  back:
+    driver: bridge
