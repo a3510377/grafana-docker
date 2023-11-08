@@ -1,8 +1,12 @@
+# PID
+# PATH
+
 services:
   node_exporter:
     image: quay.io/prometheus/node-exporter:latest
     restart: unless-stopped
     container_name: node_exporter
+    user: ${PID}
     command:
       - --path.rootfs=/host
     network_mode: host
@@ -15,9 +19,10 @@ services:
     image: prom/prometheus
     restart: unless-stopped
     container_name: prometheus
+    user: ${PID}
     volumes:
-      - ./config/prometheus:/etc/prometheus
-      - ./data/prometheus:/prometheus
+      - ${PATH}/config/prometheus:/etc/prometheus
+      - ${PATH}/data/prometheus:/prometheus
     expose: [9090:9090]
     depends_on:
       - node_exporter
@@ -26,10 +31,10 @@ services:
     image: grafana/grafana
     restart: unless-stopped
     container_name: grafana
-    user: '0'
+    user: ${PID}
     volumes:
-      - ./data/grafana:/var/lib/grafana
-      - ./config/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
+      - ${PATH}/data/grafana:/var/lib/grafana
+      - ${PATH}/config/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
     ports: [3000:3000]
     environment:
       GF_USERS_DEFAULT_LANGUAGE: detect
@@ -42,10 +47,7 @@ services:
   grafana_renderer:
     image: grafana/grafana-image-renderer
     restart: unless-stopped
+    user: ${PID}
     environment:
       BROWSER_TZ: Asia/Taipei
     ports: [8081:8081]
-
-networks:
-  back:
-    driver: bridge
