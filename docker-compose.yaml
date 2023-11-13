@@ -13,7 +13,7 @@ services:
   prometheus:
     image: prom/prometheus
     restart: unless-stopped
-    expose: [9090]
+    ports: [9090:9090]
     volumes:
       - prometheus-volume:/prometheus
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
@@ -33,24 +33,20 @@ services:
     volumes:
       - ./datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
       - grafana-storage:/var/lib/grafana
-    ports: [3000:3000]
+    ports: [3300:3000]
     environment:
+      GF_AUTH_ANONYMOUS_ENABLED: true
+      GF_AUTH_ANONYMOUS_ORG_NAME: CTEC
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+      GF_AUTH_ANONYMOUS_HIDE_VERSION: true
       GF_USERS_DEFAULT_LANGUAGE: detect
-      # GF_RENDERING_SERVER_URL: http://renderer:8081/render
+      GF_LOG_FILTERS: rendering:debug
       GF_RENDERING_CALLBACK_URL: http://grafana:3000/
     networks: [background]
     extra_hosts:
       - host.docker.internal:host-gateway
     depends_on:
       - prometheus
-      # - grafana_renderer
-
-  # grafana_renderer:
-  #   image: grafana/grafana-image-renderer
-  #   restart: unless-stopped
-  #   environment:
-  #     BROWSER_TZ: Asia/Taipei
-  #   ports: [8081:8081]
 
 volumes:
   prometheus-volume: {}
